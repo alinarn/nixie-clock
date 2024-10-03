@@ -13,7 +13,19 @@ Display::Display()
 
 void Display::displayNumber(int digits[]) {
    for (int i = 0; i < bulbCount; i++) {
-    bulbs[i].showDigit(digits[i]);
+    bulbs[i].passDigit(digits[i]);
+  }
+}
+
+void Display::cycleDigits() {
+  for (int digit = 0; digit < 10; digit++) {
+    for (int j = 0; j < 4; j++) {
+      bulbs[j].passDigit(digit);
+      bulbs[j].turnOn();
+      delay(1);
+      bulbs[j].turnOff();
+    }
+    delay(100);
   }
 }
 

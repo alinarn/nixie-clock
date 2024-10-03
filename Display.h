@@ -13,6 +13,7 @@ class Display {
     void displayNumber(int digits[]);
     void turnOnBulb(int index);
     void turnOffBulb(int index);
+    void cycleDigits();
 };
 
 #endif

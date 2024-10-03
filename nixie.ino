@@ -15,26 +15,22 @@ WiFiUDP ntpUDP;
 
 unsigned long previousOnMillis = 0;
 unsigned long previousOffMillis = 0;
+unsigned long lastCycleTime = 0;
 const long onInterval = 1;
 const long offInterval = 3;
+const long cycleInterval = 3660000; // 1 hour 1 min in milliseconds
 int bulbIndex = 0;
 bool bulbState = LOW;
+
 
 TimeManager timeManager(ntpUDP);
 Display display;
 
 void setup() {
   Serial.begin(115200);
-  while ( WiFi.status() != WL_CONNECTED ) {
-    Serial.print("Attempting to connect to WPA SSID: ");
-    Serial.println(ssid);
-    WiFi.begin(ssid, pass);
-    delay(1000);
-  }
-  Serial.println("Connected to WiFi");
+  connectToWiFi();
   timeManager.begin();
-  int* digits = timeManager.getTimeDigits();
-  display.displayNumber(digits);
+  displayTime();
 }
 
 void loop() {
@@ -42,9 +38,13 @@ void loop() {
 
   if (timeManager.timeUpdateDue(currentMillis)) {
     timeManager.updateTime();
-    int* digits = timeManager.getTimeDigits();
-    display.displayNumber(digits);
+    displayTime();
     Serial.println("Time updated");
+  }
+
+  if (currentMillis - lastCycleTime >= cycleInterval) {
+    display.cycleDigits();
+    lastCycleTime = currentMillis;
   }
 
   if (!bulbState && currentMillis - previousOnMillis >= onInterval) {
@@ -59,4 +59,19 @@ void loop() {
     bulbState = LOW;
     bulbIndex = (bulbIndex + 1) % 4;
   }
+}
+
+void displayTime() {
+  int* digits = timeManager.getTimeDigits();
+  display.displayNumber(digits);
+}
+
+void connectToWiFi() {
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    WiFi.begin(ssid, pass);
+    delay(1000);
+  }
+  Serial.println("Connected to WiFi");
 }
