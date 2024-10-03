@@ -1,5 +1,5 @@
 #include "Display.h"
-#include "config.h"
+#include "../config/config.h"
 
 Display::Display()
   : bulbs{

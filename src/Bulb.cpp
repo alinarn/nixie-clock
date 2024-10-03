@@ -1,5 +1,5 @@
 #include "Bulb.h"
-#include "bcd.h"
+#include "../config/bcd.h"
 
 Bulb::Bulb(const int powerPin, const int numberPins[4]) {
   this->powerPin = powerPin;

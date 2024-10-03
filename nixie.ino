@@ -1,12 +1,12 @@
 #include <NTPClient.h>
 #include <WiFiNINA.h> 
 #include <WiFiUdp.h>
-#include "bcd.h"
-#include "config.h"
+#include "config/bcd.h"
+#include "config/config.h"
 #include "secrets.h"
-#include "Bulb.h"
-#include "Display.h"
-#include "TimeManager.h"
+#include "src/Bulb.h"
+#include "src/Display.h"
+#include "src/TimeManager.h"
 
 const char ssid[] = SECRET_SSID;
 const char pass[] = SECRET_PASS;
