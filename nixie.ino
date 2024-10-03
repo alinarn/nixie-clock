@@ -6,15 +6,22 @@
 #include "secrets.h"
 #include "Bulb.h"
 #include "Display.h"
+#include "TimeManager.h"
 
 const char ssid[] = SECRET_SSID;
 const char pass[] = SECRET_PASS;
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
 
+unsigned long previousOnMillis = 0;
+unsigned long previousOffMillis = 0;
+const long onInterval = 1;
+const long offInterval = 3;
+int bulbIndex = 0;
+bool bulbState = LOW;
+
+TimeManager timeManager(ntpUDP);
 Display display;
-
 
 void setup() {
   Serial.begin(115200);
@@ -24,20 +31,32 @@ void setup() {
     WiFi.begin(ssid, pass);
     delay(1000);
   }
-
   Serial.println("Connected to WiFi");
-
-  int digits[4] = {1,2,3,4};
+  timeManager.begin();
+  int* digits = timeManager.getTimeDigits();
   display.displayNumber(digits);
-
-  timeClient.begin();
-  timeClient.setTimeOffset(-4 * 3600);
 }
 
 void loop() {
-  for (int i = 0; i < 4; i++) {
-    display.turnOnBulb(i);
-    delay(1000);
-    display.turnOffBulb(i);
+  unsigned long currentMillis = millis();
+
+  if (timeManager.timeUpdateDue(currentMillis)) {
+    timeManager.updateTime();
+    int* digits = timeManager.getTimeDigits();
+    display.displayNumber(digits);
+    Serial.println("Time updated");
+  }
+
+  if (!bulbState && currentMillis - previousOnMillis >= onInterval) {
+    previousOnMillis = currentMillis;
+    display.turnOnBulb(bulbIndex);
+    bulbState = HIGH;
+  }
+
+  if (bulbState && currentMillis - previousOffMillis >= offInterval) {
+    previousOffMillis = currentMillis;
+    display.turnOffBulb(bulbIndex);
+    bulbState = LOW;
+    bulbIndex = (bulbIndex + 1) % 4;
   }
 }
