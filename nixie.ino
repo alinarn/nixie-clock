@@ -5,19 +5,16 @@
 #include "config.h"
 #include "secrets.h"
 #include "Bulb.h"
+#include "Display.h"
 
 const char ssid[] = SECRET_SSID;
 const char pass[] = SECRET_PASS;
 
-Bulb bulbs[] = {
-    {BULB1_POWER_PIN, BULB1_NUMBER_PINS},
-    {BULB2_POWER_PIN, BULB2_NUMBER_PINS},
-    {BULB3_POWER_PIN, BULB3_NUMBER_PINS},
-    {BULB4_POWER_PIN, BULB4_NUMBER_PINS}
-};
-
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
+
+Display display;
+
 
 void setup() {
   Serial.begin(115200);
@@ -30,18 +27,17 @@ void setup() {
 
   Serial.println("Connected to WiFi");
 
+  int digits[4] = {1,2,3,4};
+  display.displayNumber(digits);
+
   timeClient.begin();
   timeClient.setTimeOffset(-4 * 3600);
 }
 
 void loop() {
-  for (int digit = 0; digit <= 9; digit++) {
-    for (int i = 0; i < 4; i++) {
-      bulbs[i].showDigit(digit);
-      bulbs[i].turnOn();
-      delay(1000);
-      bulbs[i].turnOff();
-      delay(1000);
-    }
+  for (int i = 0; i < 4; i++) {
+    display.turnOnBulb(i);
+    delay(1000);
+    display.turnOffBulb(i);
   }
 }
