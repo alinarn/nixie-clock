@@ -37,6 +37,8 @@ void loop() {
   if (currentMillis - lastCycleTime >= CYCLE_INTERVAL) {
     display.cycleDigits();
     lastCycleTime = currentMillis;
+    timeManager.updateTime();
+    displayTime();
   }
 
   if (!bulbState && currentMillis - previousOnMillis >= ON_INTERVAL) {
