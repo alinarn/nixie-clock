@@ -11,8 +11,8 @@ class Display {
   public:
     Display();
     void displayNumber(int digits[]);
-    void turnOnBulb(int index);
-    void turnOffBulb(int index);
+    void turnOnBulb(short index);
+    void turnOffBulb(short index);
     void cycleDigits();
 };
 

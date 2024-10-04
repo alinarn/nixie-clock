@@ -29,13 +29,13 @@ void Display::cycleDigits() {
   }
 }
 
-void Display::turnOnBulb(int index){
+void Display::turnOnBulb(short index){
   if (index >= 0 && index < bulbCount) {
     bulbs[index].turnOn();
   }
 }
 
-void Display::turnOffBulb(int index){
+void Display::turnOffBulb(short index){
   if (index >= 0 && index < bulbCount) {
     bulbs[index].turnOff();
   }

@@ -1,6 +1,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "secrets.h"
+
+const unsigned short ON_INTERVAL = 1;
+const unsigned short OFF_INTERVAL = 3;
+const unsigned long CYCLE_INTERVAL = 3660000; // 1 hour 1 min in milliseconds
+const char SSID[] = SECRET_SSID;
+const char PASS[] = SECRET_PASS;
+
 // Left to right
 // Bulb1
 const int BULB1_POWER_PIN = 13;
