@@ -12,8 +12,10 @@ WiFiUDP ntpUDP;
 unsigned long previousOnMillis = 0;
 unsigned long previousOffMillis = 0;
 unsigned long lastCycleTime = 0;
+unsigned long sleepInterval = 0;
 short bulbIndex = 0;
 bool bulbState = LOW;
+bool sleepState = false;
 
 TimeManager timeManager(ntpUDP);
 Display display;
@@ -23,41 +25,58 @@ void setup() {
   connectToWiFi();
   timeManager.begin();
   displayTime();
+  setUpSleepInterval();
 }
 
 void loop() {
   unsigned long currentMillis = millis();
-
-  if (timeManager.timeUpdateDue(currentMillis)) {
-    timeManager.updateTime();
-    displayTime();
-    Serial.println("Time updated");
+  
+  if (currentMillis >= sleepInterval) {
+    sleepInterval = currentMillis + 3600000;
+    sleepState = timeManager.isSleepTime();
+    if (sleepState) {
+      display.turnOffBulb(bulbIndex);
+      bulbState = LOW;
+    }
   }
 
-  if (currentMillis - lastCycleTime >= CYCLE_INTERVAL) {
-    display.cycleDigits();
-    lastCycleTime = currentMillis;
-    timeManager.updateTime();
-    displayTime();
-  }
+  if (!sleepState) {
+    if (timeManager.timeUpdateDue(currentMillis)) {
+      timeManager.updateTime();
+      displayTime();
+      Serial.println("Time updated");
+    }
 
-  if (!bulbState && currentMillis - previousOnMillis >= ON_INTERVAL) {
-    previousOnMillis = currentMillis;
-    display.turnOnBulb(bulbIndex);
-    bulbState = HIGH;
-  }
+    if (currentMillis - lastCycleTime >= CYCLE_INTERVAL) {
+      display.cycleDigits();
+      lastCycleTime = currentMillis;
+      timeManager.updateTime();
+      displayTime();
+    }
 
-  if (bulbState && currentMillis - previousOffMillis >= OFF_INTERVAL) {
-    previousOffMillis = currentMillis;
-    display.turnOffBulb(bulbIndex);
-    bulbState = LOW;
-    bulbIndex = (bulbIndex + 1) % 4;
+    if (!bulbState && currentMillis - previousOnMillis >= ON_INTERVAL) {
+      previousOnMillis = currentMillis;
+      display.turnOnBulb(bulbIndex);
+      bulbState = HIGH;
+    }
+
+    if (bulbState && currentMillis - previousOffMillis >= OFF_INTERVAL) {
+      previousOffMillis = currentMillis;
+      display.turnOffBulb(bulbIndex);
+      bulbState = LOW;
+      bulbIndex = (bulbIndex + 1) % 4;
+    }
   }
 }
 
 void displayTime() {
   int* digits = timeManager.getTimeDigits();
   display.displayNumber(digits);
+}
+
+void setUpSleepInterval() {
+  int minutes = timeManager.readMinutes();
+  sleepInterval = (60 - minutes) * 1000;
 }
 
 void connectToWiFi() {

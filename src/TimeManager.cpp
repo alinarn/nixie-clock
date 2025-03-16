@@ -1,4 +1,5 @@
 #include "TimeManager.h"
+#include "../config/config.h"
 
 TimeManager::TimeManager(WiFiUDP &ntpUDP) : timeClient(ntpUDP) {}
 
@@ -27,6 +28,24 @@ bool TimeManager::timeUpdateDue(unsigned long currentMillis) {
     return true;
   }
   return false;
+}
+
+bool TimeManager::isSleepTime() {
+  if (!SLEEP) {
+    return false;
+  }
+
+  hours = timeClient.getHours();
+  if (hours >= SLEEP_RANGE[0] || hours < SLEEP_RANGE[1]) {
+    return true;
+  }
+  
+  return false;
+}
+
+int TimeManager::readMinutes() {
+  minutes = timeClient.getMinutes();
+  return minutes;
 }
 
 int* TimeManager::getTimeDigits() {
