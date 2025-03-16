@@ -18,6 +18,8 @@ class TimeManager {
     void begin();
     void updateTime();
     bool timeUpdateDue(unsigned long currentMillis);
+    bool isSleepTime();
+    int readMinutes();
     int* getTimeDigits();
 };
 

@@ -8,6 +8,8 @@ const unsigned short OFF_INTERVAL = 3;
 const unsigned long CYCLE_INTERVAL = 3660000; // 1 hour 1 min in milliseconds
 const char SSID[] = SECRET_SSID;
 const char PASS[] = SECRET_PASS;
+const bool SLEEP = true;
+const int SLEEP_RANGE[2] = {22, 6}; //start and end of sleep schedule
 
 // Left to right
 // Bulb1
